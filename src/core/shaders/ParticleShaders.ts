@@ -1,30 +1,45 @@
+// src/core/shaders/ParticleShaders.ts
+
 export const vertexShader = `
   varying vec2 vUv;
+  varying vec3 vPosition;
+  
   uniform float uTime;
   uniform float uImplode;
   uniform float uExplode;
+  uniform float uAudioFreq;
+  uniform float uScale;
 
   void main() {
     vUv = uv;
+    vPosition = position;
 
-    // Normal is the direction away from the sphere center
-    vec3 direction = normalize(position);
+    vec3 normalDir = normalize(position);
+    
+    // 1. Base Scaling
+    vec3 scaledPos = position * uScale;
 
-    // Logic:
-    // Implode pulls toward center (position * 0.1)
-    // Explode pushes away from center (position + direction * 2.0)
-    vec3 implodedPos = position * 0.1;
-    vec3 explodedPos = position + direction * 2.0;
+    // 2. Solar Flare / Swirling Spikes Logic
+    // Adding uTime inside the trig functions causes the 'noise' to rotate
+    float noise = sin(position.x * 8.0 + uTime * 2.0) * cos(position.y * 8.0 + uTime * 1.5) * sin(position.z * 8.0 + uTime);
+    
+    // Spike reaction to Audio
+    float spikeFactor = pow(uAudioFreq, 2.5) * 4.0; 
+    vec3 spikeOffset = normalDir * (noise * spikeFactor);
 
-    // Blend between states
-    vec3 targetPos = mix(position, implodedPos, uImplode);
+    // 3. Morph States
+    vec3 implodedPos = scaledPos * 0.2; 
+    vec3 explodedPos = scaledPos + normalDir * 1.5;
+
+    // 4. Final Position
+    vec3 targetPos = mix(scaledPos, implodedPos, uImplode);
     targetPos = mix(targetPos, explodedPos, uExplode);
+    targetPos += spikeOffset;
 
     vec4 mvPosition = modelViewMatrix * vec4(targetPos, 1.0);
     
-    // Your Inverse Scaling
-    float baseSize = 2.0; 
-    float distanceScale = abs(mvPosition.z) * 0.5; 
+    float baseSize = 5.0; 
+    float distanceScale = (10.0 / length(mvPosition.xyz)); 
     gl_PointSize = baseSize * distanceScale;
     
     gl_Position = projectionMatrix * mvPosition;
@@ -32,32 +47,32 @@ export const vertexShader = `
 `;
 
 export const fragmentShader = `
-  varying vec2 vUv;
-  varying vec3 vPosition; // Pass position from vertex shader
+  varying vec3 vPosition;
   uniform float uTime;
   uniform vec3 uColor;
-  uniform float uAudioFreq; // We'll add this for audio
 
-  // Helper function for rainbow colors
-  vec3 rainbow(float h) {
-    float r = abs(h * 6.0 - 3.0) - 1.0;
-    float g = 2.0 - abs(h * 6.0 - 2.0);
-    float b = 2.0 - abs(h * 6.0 - 4.0);
-    return clamp(vec3(r, g, b), 0.0, 1.0);
+  vec3 getRainbow(float hue) {
+    vec3 rgb = clamp(abs(mod(hue * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0);
+    return rgb;
   }
 
   void main() {
-    float r = distance(gl_PointCoord, vec2(0.5));
-    if (r > 0.5) discard;
+    // 1. Create a hard-edged circle
+    float dist = distance(gl_PointCoord, vec2(0.5));
     
-    // Cycle hue based on time and position
-    float hue = mod(uTime * 0.2 + vPosition.y * 0.1, 1.0);
-    vec3 rainbowColor = rainbow(hue);
+    // Hard discard: anything outside the radius is gone. 
+    // No anti-aliasing or transparency = no black outlines.
+    if (dist > 0.5) discard;
 
-    // Mix standard color with rainbow based on some logic or keep it pure rainbow
-    vec3 finalColor = mix(uColor, rainbowColor, 0.8);
+    // 2. Rainbow Color Logic
+    // This only changes the color based on time and vertical position
+    float hue = mod(uTime * 0.1 + vPosition.y * 0.2, 1.0);
+    vec3 rainbowColor = getRainbow(hue);
+    
+    // Mix the gesture color (Red/Green) with the rainbow
+    vec3 finalColor = mix(uColor, rainbowColor, 0.7);
 
-    float glow = 0.5 - r;
-    gl_FragColor = vec4(finalColor * glow * (2.0 + uAudioFreq * 5.0), 1.0);
+    // 3. Output as a solid, 100% opaque block
+    gl_FragColor = vec4(finalColor, 1.0);
   }
 `;

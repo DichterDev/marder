@@ -1,15 +1,20 @@
 <template>
   <div class="experience-wrap">
+    <div v-if="!isInitialized" class="start-overlay">
+      <button class="start-btn" @click="initializeEverything">
+        ENABLE EXPERIENCE
+      </button>
+      <p>Camera and Microphone access required</p>
+    </div>
+
     <video ref="vRef" autoplay playsinline class="mirror video-feed"></video>
-
     <canvas ref="cRef" class="three-canvas"></canvas>
-
     <canvas ref="debugRef" class="debug-canvas mirror"></canvas>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 import { DrawingUtils, GestureRecognizer } from "@mediapipe/tasks-vision";
 import { SceneManager } from "../core/SceneManager";
 import { CameraHandler } from "../core/CameraHandler";
@@ -17,26 +22,37 @@ import { CameraHandler } from "../core/CameraHandler";
 const vRef = ref<HTMLVideoElement | null>(null);
 const cRef = ref<HTMLCanvasElement | null>(null);
 const debugRef = ref<HTMLCanvasElement | null>(null);
+const isInitialized = ref(false);
 
-onMounted(async () => {
-  const cameraHandler = new CameraHandler(vRef.value!);
+const initializeEverything = async () => {
+  if (!vRef.value || !cRef.value || !debugRef.value) return;
+
+  // 1. Setup Camera
+  const cameraHandler = new CameraHandler(vRef.value);
   await cameraHandler.init();
 
-  const sceneManager = new SceneManager(cRef.value!);
-  const debugCtx = debugRef.value!.getContext("2d")!;
+  // 2. Setup 3D Scene
+  const sceneManager = new SceneManager(cRef.value);
+
+  // 3. Setup Audio (Must happen in click event)
+  await sceneManager.initAudio();
+
+  const debugCtx = debugRef.value.getContext("2d")!;
   const drawingUtils = new DrawingUtils(debugCtx);
 
   debugCtx.imageSmoothingQuality = "high";
-  debugCtx.canvas.height = vRef.value!.clientHeight;
-  debugCtx.canvas.width = vRef.value!.clientWidth;
+  debugRef.value.height = vRef.value.clientHeight;
+  debugRef.value.width = vRef.value.clientWidth;
+
+  isInitialized.value = true;
 
   const loop = () => {
     const results = cameraHandler.getResults();
 
-    // 1. Update the 3D Particle Ball (Back to previous logic)
+    // Render 3D Scene
     sceneManager.render(results);
 
-    // 2. Draw the 2D Skeleton HUD
+    // Render 2D Debug HUD
     if (results && results.landmarks) {
       drawHUD(debugCtx, drawingUtils, results);
     }
@@ -44,7 +60,7 @@ onMounted(async () => {
     requestAnimationFrame(loop);
   };
   loop();
-});
+};
 
 function drawHUD(
   ctx: CanvasRenderingContext2D,
@@ -58,30 +74,23 @@ function drawHUD(
     const gesture = results.gestures[index][0].categoryName;
     const wrist = landmarks[0];
 
-    // Draw the skeleton lines
     utils.drawConnectors(landmarks, GestureRecognizer.HAND_CONNECTIONS, {
       color: "#00FF00",
       lineWidth: 2,
     });
 
-    // Draw the landmark dots
     utils.drawLandmarks(landmarks, {
       color: "#FF0000",
       lineWidth: 1,
       radius: 3,
     });
 
-    // Draw the Label at the wrist
     ctx.save();
-    // We flip the context for text because the canvas is mirrored via CSS
     ctx.scale(-1, 1);
     ctx.fillStyle = "white";
     ctx.font = "bold 12px Arial";
-
-    // Position text (Inverse X because of the scale flip)
     const tx = -(wrist.x * ctx.canvas.width);
     const ty = wrist.y * ctx.canvas.height;
-
     ctx.fillText(`${handedness}: ${gesture}`, tx + 10, ty);
     ctx.restore();
   });
@@ -94,7 +103,33 @@ function drawHUD(
   width: 100vw;
   height: 100vh;
   background: #000;
+  overflow: hidden;
 }
+
+.start-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.start-btn {
+  background: #00ff00;
+  color: black;
+  border: none;
+  padding: 20px 40px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 50px;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
 .video-feed {
   position: absolute;
   width: 100%;
@@ -102,6 +137,7 @@ function drawHUD(
   object-fit: contain;
   opacity: 0.3;
 }
+
 .mirror {
   transform: scaleX(-1);
 }
@@ -119,8 +155,7 @@ function drawHUD(
 .three-canvas {
   z-index: 15;
 }
-
 .debug-canvas {
   z-index: 10;
-} /* Keep HUD on top */
+}
 </style>
