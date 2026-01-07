@@ -5,6 +5,7 @@ export class ParticleBall {
   public mesh: THREE.Points;
   private material: THREE.ShaderMaterial;
   private targetImplode = 0;
+  private targetExplode = 0;
 
   constructor() {
     const geometry = new THREE.SphereGeometry(0.8, 64, 64); // High density
@@ -14,7 +15,8 @@ export class ParticleBall {
       uniforms: {
         uTime: { value: 0 },
         uColor: { value: new THREE.Color(0x00bfff) },
-        uImplode: { value: 0 }
+        uImplode: { value: 0 },
+        uExplode: { value: 0 }
       },
       transparent: true,
       blending: THREE.AdditiveBlending,
@@ -25,8 +27,9 @@ export class ParticleBall {
 
   update(time: number) {
     this.material.uniforms.uTime!.value = time;
-    const current = this.material.uniforms.uImplode!.value;
-    this.material.uniforms.uImplode!.value = THREE.MathUtils.lerp(current, this.targetImplode, 0.15);
+    const uniforms = this.material.uniforms;
+    uniforms.uImplode!.value = THREE.MathUtils.lerp(uniforms.uImplode!.value, this.targetImplode, 0.15);
+    uniforms.uExplode!.value = THREE.MathUtils.lerp(uniforms.uExplode!.value, this.targetExplode, 0.15); 
   }
 
   setColor(color: string) {
@@ -36,5 +39,9 @@ export class ParticleBall {
 
   public setImplode(active: boolean) {
     this.targetImplode = active ? 1 : 0;
+  }
+
+  public setExplode(active: boolean) {
+    this.targetExplode = active ? 1 : 0;
   }
 }

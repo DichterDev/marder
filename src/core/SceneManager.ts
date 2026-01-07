@@ -24,7 +24,7 @@ export class SceneManager {
       antialias: true
     });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.setPixelRatio(window.devicePixelRatio);
 
     // 4. Initialize the Particle Ball
     this.ball = new ParticleBall();
@@ -49,18 +49,27 @@ export class SceneManager {
     if (!results.landmarks || results.landmarks.length === 0) return;
 
     results.landmarks.forEach((landmarks, index) => {
-      const handedness = results.handedness[index][0].categoryName;
-      const gesture = results.gestures[index][0].categoryName as HandGesture;
+      const handedness = results.handedness[index]![0]!.categoryName;
+      const gesture = results.gestures[index]![0]!.categoryName as HandGesture;
 
       // 1. LEFT HAND: Position the ball
       if (handedness === "Left") {
         const trackingPoint = landmarks[HandLandmark.MIDDLE_FINGER_MCP];
         this.updateBallPosition(trackingPoint!);
 
-        if (gesture === HandGesture.CLOSED_FIST) {
-          this.ball.setImplode(true);
-        } else {
-          this.ball.setImplode(false);
+        switch (gesture) {
+          case HandGesture.CLOSED_FIST:
+            this.ball.setImplode(true);
+            this.ball.setExplode(false);
+            break;
+          case HandGesture.POINTING_UP:
+            this.ball.setExplode(true);
+            this.ball.setImplode(false);
+            break;
+          default:
+            this.ball.setExplode(false);
+            this.ball.setImplode(false);
+            break;
         }
       }
 
