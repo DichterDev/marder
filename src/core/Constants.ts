@@ -1,0 +1,2 @@
+export const PARTICLE_RES = 128; 
+export const PARTICLE_COUNT = PARTICLE_RES * PARTICLE_RES;

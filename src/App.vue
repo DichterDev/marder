@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import Experience from "./components/Experience.vue";
+import ExperienceComponent from './components/ExperienceComponent.vue';
+
 </script>
 
 <template>
-  <Experience></Experience>
+  <ExperienceComponent></ExperienceComponent>
 </template>
 
 <style scoped></style>
