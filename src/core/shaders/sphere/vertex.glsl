@@ -9,7 +9,7 @@ uniform float uExplodeTime;
 varying vec3 vPosition;
 
 void main() {
-    vec3 pos = position;
+    vec3 pos = position * uScale;
 
     if (uExplode) {
         vec3 baseDir = normalize(position);
@@ -21,7 +21,7 @@ void main() {
 
         vec3 finalDir = normalize(baseDir + noiseDir);
         
-        float speed = 10.0; 
+        float speed = 3.0; 
         
         float individualSpeed = speed * (0.8 + getDetailNoise(pos, 0.0) * 0.4);
         
@@ -29,8 +29,6 @@ void main() {
     } else {
       pos += calculateWobble(pos, uTime, uAudioFreq);
     }
-
-    pos *= uScale;
 
     vPosition = pos;
 

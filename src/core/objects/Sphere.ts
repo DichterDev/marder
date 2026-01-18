@@ -55,19 +55,14 @@ export class Sphere implements Object {
     uniforms.uTime!.value = elapsed;
 
     if (this.isExploding) {
-      if (this.currentScale > this.minScale + 0.01) {
-        this.currentScale = lerp(this.currentScale, this.minScale, 0.05);
-        console.log(this.currentScale);
-      } else {
-        const deltaStartTime = elapsed - this.explosionStartTime;
+      const deltaStartTime = elapsed - this.explosionStartTime;
 
-        if (deltaStartTime < this.EXPLOSION_DURATION) {
-          uniforms.uExplodeTime!.value = deltaStartTime;
-        }
+      if (deltaStartTime < this.EXPLOSION_DURATION) {
+        uniforms.uExplodeTime!.value = deltaStartTime;
+      }
 
-        if (deltaStartTime >= this.EXPLOSION_COOLDOWN) {
-          this.resetExplosion();
-        }
+      if (deltaStartTime >= this.EXPLOSION_COOLDOWN) {
+        this.resetExplosion();
       }
     }
 
@@ -144,7 +139,7 @@ export class Sphere implements Object {
 
     this.isExploding = true;
     this.onCooldown = true;
-    this.explosionStartTime = performance.now() / 1000;
+    this.explosionStartTime = this.material!.uniforms.uTime!.value;
     this.material.uniforms.uExplode!.value = true;
   }
 
