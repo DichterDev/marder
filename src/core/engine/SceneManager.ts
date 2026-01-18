@@ -1,10 +1,11 @@
 import * as THREE from "three";
 import type { GestureRecognizerResult } from "@mediapipe/tasks-vision";
-import { ParticleBall } from "../objects/ParticleBall";
+import { Sphere } from "../objects/Sphere";
 import { AudioHandler } from "../controllers/AudioHandler";
 import { GestureHandler } from "../controllers/GestureHandler";
 import { HandGesture } from "../../types/Gestures";
 import type { GestureState } from "@/types/GestureState";
+import type { Object } from "../objects/Object";
 
 export class SceneManager {
   private scene: THREE.Scene = new THREE.Scene();
@@ -13,14 +14,12 @@ export class SceneManager {
   private audio: AudioHandler = new AudioHandler();
   private clock: THREE.Clock = new THREE.Clock();
   private gestureHandler: GestureHandler = new GestureHandler();
-  
-  // High-performance FPS Control
-  private readonly fpsLimit: number = 60;
+
   private readonly frameInterval: number = 1 / 60;
   private deltaAccumulator: number = 0;
 
   // Active Model (to be expanded to ParticleHeart | ParticleBasketball)
-  private currentModel: ParticleBall;
+  private currentModel: Object;
 
   constructor(canvas: HTMLCanvasElement) {
     const aspect = window.innerWidth / window.innerHeight;
@@ -34,8 +33,9 @@ export class SceneManager {
     });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.outputColorSpace = THREE.SRGBColorSpace;
 
-    this.currentModel = new ParticleBall();
+    this.currentModel = new Sphere();
     this.scene.add(this.currentModel.mesh);
 
     window.addEventListener("resize", () => this.onWindowResize());
@@ -55,7 +55,7 @@ export class SceneManager {
 
     // Hardcoded 60FPS Limit check
     if (this.deltaAccumulator < this.frameInterval) {
-      return; 
+      return;
     }
 
     // Logic for this frame
@@ -71,7 +71,7 @@ export class SceneManager {
 
     // 2. Process Audio
     const bass = this.audio.getFrequencyData();
-    this.currentModel.setAudioReaction(bass);
+    this.currentModel.handleAudio(bass);
 
     // 3. Update Model (Time-based for fluid transitions)
     this.currentModel.update(elapsed, logicDelta);
@@ -84,25 +84,20 @@ export class SceneManager {
    * Maps abstract gesture states to specific 3D model actions.
    */
   private applyGestureState(state: GestureState): void {
-    // Left Hand: Morphing States
     if (state.leftHand.exists) {
-      this.currentModel.setImplode(state.leftHand.gesture === HandGesture.CLOSED_FIST);
-      this.currentModel.setExplode(state.leftHand.gesture === HandGesture.POINTING_UP);
     }
 
-    // Right Hand: Color Transitions
     if (state.rightHand.exists) {
-      if (state.rightHand.gesture === HandGesture.OPEN_PALM) {
-        this.currentModel.setGradient("#ff3333", "#ff9900"); // Red-Orange gradient
-      }
-      if (state.rightHand.gesture === HandGesture.THUMB_UP) {
-        this.currentModel.setGradient("#33ff33", "#00ffff"); // Green-Cyan gradient
-      }
+      this.currentModel.handleGesture(state);
     }
 
     // Co-op: World Position Lerp
     if (state.targetPosition) {
-      const target = new THREE.Vector3(state.targetPosition.x, state.targetPosition.y, state.targetPosition.z);
+      const target = new THREE.Vector3(
+        state.targetPosition.x,
+        state.targetPosition.y,
+        state.targetPosition.z,
+      );
       this.currentModel.mesh.position.lerp(target, 0.1);
     }
   }
@@ -118,3 +113,4 @@ export class SceneManager {
     this.currentModel.dispose();
   }
 }
+

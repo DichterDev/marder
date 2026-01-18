@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { vertexShader, fragmentShader } from "./shaders/ParticleShaders";
 
-export class ParticleBall {
+export class Sphere {
   public mesh: THREE.Points;
   private material: THREE.ShaderMaterial;
   private targetImplode = 0;
@@ -25,7 +25,7 @@ export class ParticleBall {
         uScale: { value: 1.0 }, // New Uniform for size constraints
       },
       transparent: false,
-      blending: THREE.NormalBlending,
+      blending: THREE.AdditiveBlending,
       depthWrite: true,
     });
     this.mesh = new THREE.Points(geometry, this.material);

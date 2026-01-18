@@ -9,7 +9,7 @@
 
     <video ref="vRef" autoplay playsinline class="mirror video-feed"></video>
     <canvas ref="cRef" class="three-canvas"></canvas>
-    
+
     <DebugHUD :results="latestResults" :video-element="vRef" />
     <StatsMonitor v-if="debugMode" />
   </div>
@@ -19,9 +19,9 @@
 import { ref } from "vue";
 import type { GestureRecognizerResult } from "@mediapipe/tasks-vision";
 import { SceneManager } from "../core/engine/SceneManager";
-import { CameraHandler } from "../core/controllers/CameraHandler";
 import DebugHUD from "./DebugHUD.vue";
 import StatsMonitor from "./StatsMonitor.vue";
+import { CameraHandler } from "@/core/controllers/CameraHandler";
 
 const vRef = ref<HTMLVideoElement | null>(null);
 const cRef = ref<HTMLCanvasElement | null>(null);
@@ -90,7 +90,9 @@ const initializeEverything = async () => {
   object-fit: contain;
   opacity: 0.3;
 }
-.mirror { transform: scaleX(-1); }
+.mirror {
+  transform: scaleX(-1);
+}
 .three-canvas {
   position: absolute;
   inset: 0;
@@ -100,3 +102,4 @@ const initializeEverything = async () => {
   pointer-events: none;
 }
 </style>
+

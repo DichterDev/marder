@@ -1,0 +1,13 @@
+export enum Color {
+  PEACE = "RAINBOW",
+  LOVE_START = "#F8BBD0",
+  LOVE_END = "#9C27B0",
+  HAPPY_START = "#FFF176",
+  HAPPY_END = "#FF9800",
+  SAD_START = "#4DD0E1",
+  SAD_END = "#0D47A1",
+  ANGRY_START = "#EF5350",
+  ANGRY_END = "#6D1B1B",
+  NOISE_START = "#FFFFFF",
+  NOISE_END = "#757575",
+}
