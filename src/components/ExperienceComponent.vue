@@ -88,7 +88,7 @@ const initializeEverything = async () => {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  opacity: 0.3;
+  /* opacity: 0.3; */
 }
 .mirror {
   transform: scaleX(-1);
@@ -102,4 +102,3 @@ const initializeEverything = async () => {
   pointer-events: none;
 }
 </style>
-

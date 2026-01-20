@@ -84,14 +84,8 @@ export class SceneManager {
    * Maps abstract gesture states to specific 3D model actions.
    */
   private applyGestureState(state: GestureState): void {
-    if (state.leftHand.exists) {
-    }
+    this.currentModel.handleGesture(state);
 
-    if (state.rightHand.exists) {
-      this.currentModel.handleGesture(state);
-    }
-
-    // Co-op: World Position Lerp
     if (state.targetPosition) {
       const target = new THREE.Vector3(
         state.targetPosition.x,
@@ -113,4 +107,3 @@ export class SceneManager {
     this.currentModel.dispose();
   }
 }
-

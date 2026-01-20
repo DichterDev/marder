@@ -47,7 +47,7 @@ export class Sphere implements Object {
         uExplodeTime: { value: 0.0 },
       },
       transparent: false,
-      blending: THREE.NoBlending,
+      blending: THREE.NormalBlending,
       depthWrite: true,
     });
 
@@ -85,33 +85,52 @@ export class Sphere implements Object {
     } else if (this.growthDirection == -1) {
       this.currentScale = lerp(this.currentScale, this.SCALE_MIN - 0.01, 0.05);
     }
+    this.syncScale();
   }
 
   public handleGesture(state: GestureState): void {
-    if (!state.rightHand) return;
-
-    const lGesture = state.leftHand.gesture;
-    const rGesture: HandGesture = state.rightHand.gesture;
-
-
-    // IMPORTANT: no break on non scale related, breaks scaling logic
-    switch (lGesture) {
-      case HandGesture.OPEN_PALM:
-        // enables color control
-        this.handleColor(rGesture);
-      case HandGesture.THUMB_UP:
-        // increase scale
-        this.growthDirection = 1;
-        break;
-      case HandGesture.THUMB_DOWN:
-        // decrase scale
-        this.growthDirection = -1;
-        break;
-      default:
-        this.growthDirection = 0;
-        break;
+    if (state.leftHand.exists) {
+      // IMPORTANT: no break on non scale related, breaks scaling logic
+      switch (state.leftHand.gesture) {
+        case HandGesture.THUMB_UP:
+          // increase scale
+          this.growthDirection = 1;
+          break;
+        case HandGesture.THUMB_DOWN:
+          // decrase scale
+          this.growthDirection = -1;
+          break;
+        default:
+          this.growthDirection = 0;
+          break;
+      }
     }
 
+    if (state.rightHand.exists) {
+      switch (state.rightHand.gesture) {
+        case HandGesture.OPEN_PALM:
+          this.setGradient(Color.NOISE_START, Color.NOISE_END);
+          break;
+        case HandGesture.I_LOVE_YOU:
+          this.setGradient(Color.LOVE_START, Color.LOVE_END);
+          break;
+        case HandGesture.THUMB_UP:
+          this.setGradient(Color.HAPPY_START, Color.HAPPY_END);
+          break;
+        case HandGesture.THUMB_DOWN:
+          this.setGradient(Color.SAD_START, Color.SAD_END);
+          break;
+        case HandGesture.VICTORY:
+          this.setGradient(Color.PEACE, Color.PEACE);
+          break;
+        case HandGesture.CLOSED_FIST:
+          this.setGradient(Color.ANGRY_START, Color.ANGRY_END);
+          this.triggerExplosion();
+          break;
+        default:
+          break;
+      }
+    }
   }
 
   public handleAudio(bass: number): void {
@@ -121,32 +140,6 @@ export class Sphere implements Object {
   public dispose(): void {
     this.mesh.geometry.dispose();
     this.material.dispose();
-  }
-
-  private handleColor(gesture: HandGesture): void {
-    switch (gesture) {
-      case HandGesture.OPEN_PALM:
-        this.setGradient(Color.NOISE_START, Color.NOISE_END);
-        break;
-      case HandGesture.I_LOVE_YOU:
-        this.setGradient(Color.LOVE_START, Color.LOVE_END);
-        break;
-      case HandGesture.THUMB_UP:
-        this.setGradient(Color.HAPPY_START, Color.HAPPY_END);
-        break;
-      case HandGesture.THUMB_DOWN:
-        this.setGradient(Color.SAD_START, Color.SAD_END);
-        break;
-      case HandGesture.VICTORY:
-        this.setGradient(Color.PEACE, Color.PEACE);
-        break;
-      case HandGesture.CLOSED_FIST:
-        this.setGradient(Color.ANGRY_START, Color.ANGRY_END);
-        this.triggerExplosion();
-        break;
-      default:
-        break;
-    }
   }
 
   private setGradient(start: Color, end: Color): void {
