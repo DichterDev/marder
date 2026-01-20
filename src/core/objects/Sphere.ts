@@ -123,12 +123,18 @@ export class Sphere implements Object {
         case HandGesture.VICTORY:
           this.setGradient(Color.PEACE, Color.PEACE);
           break;
-        case HandGesture.CLOSED_FIST:
-          this.setGradient(Color.ANGRY_START, Color.ANGRY_END);
-          this.triggerExplosion();
-          break;
         default:
           break;
+      }
+    }
+
+    if (state.leftHand.exists && state.leftHand.exists) {
+      if (
+        state.rightHand.gesture === HandGesture.CLOSED_FIST &&
+        state.leftHand.gesture === HandGesture.CLOSED_FIST
+      ) {
+        this.setGradient(Color.ANGRY_START, Color.ANGRY_END);
+        this.triggerExplosion();
       }
     }
   }

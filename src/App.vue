@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import ExperienceComponent from './components/ExperienceComponent.vue';
-
+import { RouterView } from "vue-router";
+import HeaderComponent from "./components/HeaderComponent.vue";
 </script>
 
 <template>
-  <ExperienceComponent></ExperienceComponent>
+  <RouterView></RouterView>
 </template>
 
 <style scoped></style>

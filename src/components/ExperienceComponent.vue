@@ -56,8 +56,8 @@ const initializeEverything = async () => {
 <style scoped>
 .experience-wrap {
   position: relative;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   background: #000;
   overflow: hidden;
 }
@@ -88,7 +88,7 @@ const initializeEverything = async () => {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  /* opacity: 0.3; */
+  opacity: 0.3;
 }
 .mirror {
   transform: scaleX(-1);
