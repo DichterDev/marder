@@ -8,6 +8,8 @@ import { Color } from "@/types/Color";
 import type { GestureState } from "@/types/GestureState";
 import { lerp } from "three/src/math/MathUtils.js";
 
+type GrowthDirection = -1 | 0 | 1;
+
 export class Sphere implements Object {
   public mesh: THREE.Points;
   private material: THREE.ShaderMaterial;
@@ -16,11 +18,14 @@ export class Sphere implements Object {
   private targetColorEnd = new THREE.Color(0x757575);
 
   private currentScale = 1.0;
-  private minScale = 0.1;
+  private growthDirection: GrowthDirection = 0;
 
   private explosionStartTime = 0;
   private isExploding = false;
   private onCooldown = false;
+
+  private readonly SCALE_MIN = 0.1;
+  private readonly SCALE_MAX = 3.0;
 
   private readonly EXPLOSION_DURATION = 3.0;
   private readonly EXPLOSION_COOLDOWN = 10.0;
@@ -72,15 +77,59 @@ export class Sphere implements Object {
 
     this.mesh.rotation.y += 0.5 * delta;
     this.mesh.rotation.x += 0.2 * delta;
+
+    if (this.growthDirection == 0) {
+      // no growth
+    } else if (this.growthDirection == 1) {
+      this.currentScale = lerp(this.currentScale, this.SCALE_MAX + 0.01, 0.05);
+    } else if (this.growthDirection == -1) {
+      this.currentScale = lerp(this.currentScale, this.SCALE_MIN - 0.01, 0.05);
+    }
   }
 
   public handleGesture(state: GestureState): void {
     if (!state.rightHand) return;
 
-    const gesture: HandGesture = state.rightHand.gesture;
+    const lGesture = state.leftHand.gesture;
+    const rGesture: HandGesture = state.rightHand.gesture;
+
+
+    // IMPORTANT: no break on non scale related, breaks scaling logic
+    switch (lGesture) {
+      case HandGesture.OPEN_PALM:
+        // enables color control
+        this.handleColor(rGesture);
+      case HandGesture.THUMB_UP:
+        // increase scale
+        this.growthDirection = 1;
+        break;
+      case HandGesture.THUMB_DOWN:
+        // decrase scale
+        this.growthDirection = -1;
+        break;
+      default:
+        this.growthDirection = 0;
+        break;
+    }
+
+  }
+
+  public handleAudio(bass: number): void {
+    this.setAudioReaction(bass);
+  }
+
+  public dispose(): void {
+    this.mesh.geometry.dispose();
+    this.material.dispose();
+  }
+
+  private handleColor(gesture: HandGesture): void {
     switch (gesture) {
       case HandGesture.OPEN_PALM:
         this.setGradient(Color.NOISE_START, Color.NOISE_END);
+        break;
+      case HandGesture.I_LOVE_YOU:
+        this.setGradient(Color.LOVE_START, Color.LOVE_END);
         break;
       case HandGesture.THUMB_UP:
         this.setGradient(Color.HAPPY_START, Color.HAPPY_END);
@@ -98,15 +147,6 @@ export class Sphere implements Object {
       default:
         break;
     }
-  }
-
-  public handleAudio(bass: number): void {
-    this.setAudioReaction(bass);
-  }
-
-  public dispose(): void {
-    this.mesh.geometry.dispose();
-    this.material.dispose();
   }
 
   private setGradient(start: Color, end: Color): void {
@@ -131,6 +171,12 @@ export class Sphere implements Object {
   }
 
   private syncScale() {
+    if (this.currentScale > this.SCALE_MAX) {
+      this.currentScale = this.SCALE_MAX;
+    } else if (this.currentScale < this.SCALE_MIN) {
+      this.currentScale = this.SCALE_MIN;
+    }
+
     this.material.uniforms.uScale!.value = this.currentScale;
   }
 
