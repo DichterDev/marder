@@ -22,9 +22,13 @@ export class CameraHandler {
         runningMode: "VIDEO",
         numHands: 2,
       });
+      
+      // Webcam-Zugriff anfragen
       this.video.srcObject = await navigator.mediaDevices.getUserMedia({
         video: { width: { ideal: 1920 }, height: { ideal: 1080 } },
+        audio: false // WICHTIG: Audio hier deaktiviert lassen!
       });
+      
     } catch (err) {
       console.error("MediaPipe failed to load.", err);
     }
@@ -32,6 +36,8 @@ export class CameraHandler {
 
   getResults() {
     if (this.video.readyState < 2) return null;
+    if (!this.recognizer) return null; // Schutz, falls init noch nicht fertig ist
+
     const timestamp = Math.round(performance.now());
     try {
       return this.recognizer.recognizeForVideo(this.video, timestamp);

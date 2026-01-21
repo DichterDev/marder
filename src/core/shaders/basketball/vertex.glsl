@@ -18,6 +18,8 @@ void main() {
   pos *= uScale;
   vPosition = pos;
 
+  vPosition.y = mix(1.0, 0.0, uMorphProgress) * uScale;
+
   vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
 
   float baseSize = 3.0;

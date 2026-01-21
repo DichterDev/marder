@@ -30,27 +30,9 @@ import HeaderComponent from "@/components/HeaderComponent.vue";
         </div>
       </div>
       <div class="text">
-        <p>
-          Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
-          nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat,
-          sed diam voluptua. At vero eos et accusam et justo duo dolores et ea
-          rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem
-          ipsum dolor sit amet.
-        </p>
-        <p>
-          Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
-          nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat,
-          sed diam voluptua. At vero eos et accusam et justo duo dolores et ea
-          rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem
-          ipsum dolor sit amet.
-        </p>
-        <p>
-          Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse
-          molestie consequat, vel illum dolore eu feugiat nulla facilisis at
-          vero eros et accumsan et iusto odio dignissim qui blandit praesent
-          luptatum zzril delenit augue duis dolore te feugait nulla facilisi.
-          Lorem ipsum dolor sit amet.
-        </p>
+        <p>Ziel war die Entwicklung einer erweiterten Form der Wahrnehmung, die an synästhetische Übersetzungsprozesse angelehnt war. Audiosignale wurden visuell erfahrbar gemacht, indem sie in Farbwerte und bildhafte Repräsentationen übersetzt wurden, wodurch ein vielschichtiges Zusammenspiel von Klang und Bild entstand. Auf diese Weise wurden neue Zugänge zu multisensorischer Erfahrung eröffnet und bestehende Wahrnehmungsgrenzen bewusst thematisiert und reflektiert.</p>
+        <p>Gleichzeitig wurden Farben als Ausgangspunkt für akustische Transformationen eingesetzt und zur gezielten Beeinflussung klanglicher Parameter genutzt. Durch diese bidirektionale Beziehung zwischen visuellen und auditiven Ebenen wurde ein dynamischer Prozess erzeugt, in dem sich beide Modalitäten fortlaufend veränderten und gegenseitig beeinflussten. Der Schwerpunkt lag dabei auf der systematischen und experimentellen Untersuchung dieser Wechselwirkungen sowie ihrer gestalterischen und konzeptuellen Potenziale.</p>
+        <p>Ergänzend wurde Motion Tracking integriert, um visuelle Darstellungen zu modulieren oder Audiosignale in Echtzeit zu verändern. Aspekte der Farbwahrnehmung, der Farbenpsychologie sowie ein analytisch-kreativer Umgang mit Bewegung und Interaktion bildeten zentrale Bestandteile des abgeschlossenen Konzepts. Auf diese Weise wurde ein immersiver Erfahrungsraum realisiert, in dem Wahrnehmung als prozesshafter, wandelbarer Zustand erfahrbar gemacht wurde.</p>
       </div>
     </div>
   </main>

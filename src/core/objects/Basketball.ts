@@ -9,7 +9,6 @@ export class Basketball implements Object {
   public mesh: THREE.Points;
   private material: THREE.ShaderMaterial;
 
-  private currentScale: number = 1.0;
 
   constructor() {
     const geometry = new THREE.SphereGeometry(
@@ -18,19 +17,21 @@ export class Basketball implements Object {
       PARTICLE_RES - 1,
     );
 
+    geometry.translate(0, 1, 0);
+
     this.material = new THREE.ShaderMaterial({
       vertexShader,
       fragmentShader,
       uniforms: {
         uTime: { value: 0 },
         uAudioFreq: { value: 0 },
-        uScale: { value: 1.0 },
-        uOrange: { value: new THREE.Color(THREE.Color.NAMES.darkorange) },
-        uBlack: { value: new THREE.Color(THREE.Color.NAMES.black) },
+        uScale: { value: 2.0 },
+        uOrange: { value: new THREE.Color("#EA7B40") },
+        uBlack: { value: new THREE.Color(0x000000) },
         uMorphProgress: { value: 0.0 },
       },
       transparent: true,
-      blending: THREE.AdditiveBlending,
+      blending: THREE.NormalBlending,
       depthWrite: false,
     });
 
@@ -42,9 +43,9 @@ export class Basketball implements Object {
 
     uniforms.uTime!.value = elapsed;
 
-    this.mesh.rotation.y += 0.5 * delta;
+    this.mesh.rotation.y += 10 * delta;
 
-    uniforms.uScale!.value = this.currentScale;
+    uniforms.uScale!.value = 2.0;
   }
 
   handleAudio(freq: number): void {
