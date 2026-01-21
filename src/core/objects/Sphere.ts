@@ -31,7 +31,11 @@ export class Sphere implements Object {
   private readonly EXPLOSION_COOLDOWN = 10.0;
 
   constructor() {
-    const geometry = new THREE.SphereGeometry(1.0, PARTICLE_RES, PARTICLE_RES);
+    const geometry = new THREE.SphereGeometry(
+      1.0,
+      PARTICLE_RES - 1,
+      PARTICLE_RES - 1,
+    );
 
     this.material = new THREE.ShaderMaterial({
       vertexShader,
@@ -45,6 +49,7 @@ export class Sphere implements Object {
         uRainbow: { value: true },
         uExplode: { value: false },
         uExplodeTime: { value: 0.0 },
+        uMorphProgress: { value: 0.0 },
       },
       transparent: false,
       blending: THREE.NormalBlending,
@@ -89,6 +94,8 @@ export class Sphere implements Object {
   }
 
   public handleGesture(state: GestureState): void {
+    console.log(state.leftHand.exists + " : " + state.rightHand.exists);
+
     if (state.leftHand.exists) {
       // IMPORTANT: no break on non scale related, breaks scaling logic
       switch (state.leftHand.gesture) {

@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { onBeforeUnmount, ref } from "vue";
 import type { GestureRecognizerResult } from "@mediapipe/tasks-vision";
 import { SceneManager } from "../core/engine/SceneManager";
 import DebugHUD from "./DebugHUD.vue";
@@ -28,6 +28,7 @@ const cRef = ref<HTMLCanvasElement | null>(null);
 const isInitialized = ref(false);
 const debugMode = ref(true); // Toggle for stats.js
 const latestResults = ref<GestureRecognizerResult | null>(null);
+const sceneManagerRef = ref<SceneManager | null>(null);
 
 const initializeEverything = async () => {
   if (!vRef.value || !cRef.value) return;
@@ -37,6 +38,8 @@ const initializeEverything = async () => {
 
   const sceneManager = new SceneManager(cRef.value);
   await sceneManager.initAudio();
+
+  sceneManagerRef.value = sceneManager;
 
   isInitialized.value = true;
 
@@ -51,6 +54,10 @@ const initializeEverything = async () => {
   };
   loop();
 };
+
+onBeforeUnmount(() => {
+  sceneManagerRef.value?.dispose();
+}, this);
 </script>
 
 <style scoped>
@@ -87,7 +94,7 @@ const initializeEverything = async () => {
   position: absolute;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   opacity: 0.3;
 }
 .mirror {
@@ -100,5 +107,6 @@ const initializeEverything = async () => {
   height: 100%;
   z-index: 15;
   pointer-events: none;
+  display: block;
 }
 </style>

@@ -5,11 +5,14 @@ uniform float uAudioFreq;
 uniform float uScale;
 uniform bool uExplode;
 uniform float uExplodeTime;
+uniform float uMorphProgress;
+
+attribute vec3 aTargetPosition;
 
 varying vec3 vPosition;
 
 void main() {
-  vec3 pos = position * uScale;
+  vec3 pos = position;
 
   if (uExplode) {
     vec3 baseDir = normalize(position);
@@ -27,8 +30,11 @@ void main() {
 
     pos += finalDir * individualSpeed * uExplodeTime;
   } else {
+    pos = morphPosition(position, aTargetPosition, uMorphProgress);
     pos += calculateWobble(pos, uTime, uAudioFreq);
   }
+
+  pos *= uScale;
 
   vPosition = pos;
 

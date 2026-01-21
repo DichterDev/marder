@@ -3,16 +3,24 @@
 uniform float uTime;
 uniform float uAudioFreq;
 uniform float uScale;
+uniform float uMorphProgress;
+
+attribute vec3 aTargetPosition;
+
 varying vec3 vPosition;
 
 void main() {
-    vec3 pos = position;
-    // Apply audio-driven wobble
-    pos += calculateWobble(pos, uTime, uAudioFreq);
-    pos *= uScale;
-    vPosition = pos;
+  vec3 pos = position;
 
-    vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
-    gl_PointSize = (12.0 / -mvPosition.z);
-    gl_Position = projectionMatrix * mvPosition;
+  pos = morphPosition(position, aTargetPosition, uMorphProgress);
+
+  pos += calculateWobble(pos, uTime, uAudioFreq);
+  pos *= uScale;
+  vPosition = pos;
+
+  vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+
+  float baseSize = 3.0;
+  gl_PointSize = baseSize * (10.0 / length(mvPosition.xyz));
+  gl_Position = projectionMatrix * mvPosition;
 }
