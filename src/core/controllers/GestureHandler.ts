@@ -51,6 +51,8 @@ export class GestureHandler {
 
       if (score < 0.75) return;
 
+      console.log(category.categoryName);
+
       if (handedness === "Left") {
         leftHand = new DetectedHand(landmarks, gesture);
       } else if (handedness === "Right") {

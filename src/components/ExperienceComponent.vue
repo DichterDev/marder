@@ -1,10 +1,19 @@
 <template>
   <div class="experience-wrap">
     <div v-if="!isInitialized" class="start-overlay">
-      <button class="start-btn" @click="initializeEverything">
-        ENABLE EXPERIENCE
-      </button>
-      <p>Camera and Microphone access required</p>
+      <div class="grid-container"></div>
+
+      <div class="prompt-container">
+        <div class="prompt-line webcam">turn on webcam</div>
+        <div class="prompt-line audio">turn on audio</div>
+        <button
+          class="prompt-line insanity"
+          @click="initializeEverything"
+          type="button"
+        >
+          turn on insanity
+        </button>
+      </div>
     </div>
 
     <video ref="vRef" autoplay playsinline class="mirror video-feed"></video>
@@ -16,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount, ref } from "vue";
+import { ref } from "vue";
 import type { GestureRecognizerResult } from "@mediapipe/tasks-vision";
 import { SceneManager } from "../core/engine/SceneManager";
 import DebugHUD from "./DebugHUD.vue";
@@ -26,11 +35,10 @@ import { CameraHandler } from "@/core/controllers/CameraHandler";
 const vRef = ref<HTMLVideoElement | null>(null);
 const cRef = ref<HTMLCanvasElement | null>(null);
 const isInitialized = ref(false);
-const debugMode = ref(true); // Toggle for stats.js
+const debugMode = ref(true);
 const latestResults = ref<GestureRecognizerResult | null>(null);
-const sceneManagerRef = ref<SceneManager | null>(null);
 
-const initializeEverything = async () => {
+const initializeEverything = async (): Promise<void> => {
   if (!vRef.value || !cRef.value) return;
 
   const cameraHandler = new CameraHandler(vRef.value);
@@ -39,67 +47,128 @@ const initializeEverything = async () => {
   const sceneManager = new SceneManager(cRef.value);
   await sceneManager.initAudio();
 
-  sceneManagerRef.value = sceneManager;
-
   isInitialized.value = true;
 
-  const loop = () => {
+  const loop = (): void => {
     const results = cameraHandler.getResults();
     latestResults.value = results;
-
-    // The SceneManager now handles its own 60FPS throttling and time-based delta
     sceneManager.render(results);
-
     requestAnimationFrame(loop);
   };
   loop();
 };
-
-onBeforeUnmount(() => {
-  sceneManagerRef.value?.dispose();
-}, this);
 </script>
 
 <style scoped>
 .experience-wrap {
   position: relative;
   width: 100%;
-  height: 100%;
-  background: #000;
+  height: 100vh;
+  background: var(--bg-black);
   overflow: hidden;
 }
+
 .start-overlay {
   position: absolute;
   inset: 0;
   z-index: 100;
-  background: rgba(0, 0, 0, 0.85);
+  background: var(--bg-black);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Point Grid Implementation:
+  Uses a radial gradient background pattern to ensure infinite vertical 
+  and horizontal coverage without DOM overhead.
+*/
+.grid-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.4) 1px,
+    transparent 1px
+  );
+  background-size: 32px 32px;
+  background-position: center;
+
+  /* Mask to create the "hole" behind the text and fade edges */
+  mask-image: radial-gradient(
+    circle at center,
+    transparent 0px,
+    transparent 180px,
+    black 300px,
+    black 60%,
+    transparent 95%
+  );
+  -webkit-mask-image: radial-gradient(
+    circle at center,
+    transparent 0px,
+    transparent 180px,
+    black 300px,
+    black 60%,
+    transparent 95%
+  );
+}
+
+.prompt-container {
+  position: relative;
+  z-index: 110;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  color: white;
+  gap: 0.1rem;
 }
-.start-btn {
-  background: #00ff00;
-  color: black;
+
+.prompt-line {
+  font-family: "monomaniac", monospace; /* Strictly following your font rule */
+  font-size: 3.5rem;
+  text-transform: lowercase;
+  color: var(--text-white);
+  background: none;
   border: none;
-  padding: 20px 40px;
-  font-size: 1.2rem;
-  font-weight: bold;
-  border-radius: 50px;
-  cursor: pointer;
-  margin-bottom: 20px;
+  padding: 0;
+  margin: 0;
+  cursor: default;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  line-height: 1.1;
+  white-space: nowrap;
 }
+
+.webcam {
+  transform: translateX(-60px);
+}
+
+.audio {
+  transform: translateX(-40px);
+}
+
+.insanity {
+  transform: translateX(20px);
+  color: var(--brand-red);
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.insanity:hover {
+  opacity: 0.7;
+}
+
 .video-feed {
   position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.3;
+  opacity: 0.2;
 }
+
 .mirror {
   transform: scaleX(-1);
 }
+
 .three-canvas {
   position: absolute;
   inset: 0;
@@ -107,6 +176,5 @@ onBeforeUnmount(() => {
   height: 100%;
   z-index: 15;
   pointer-events: none;
-  display: block;
 }
 </style>

@@ -76,8 +76,6 @@ export class Sphere implements Object {
       }
     }
 
-    this.syncScale();
-
     if (this.onCooldown) return;
 
     this.mesh.rotation.y += 0.5 * delta;
@@ -94,9 +92,8 @@ export class Sphere implements Object {
   }
 
   public handleGesture(state: GestureState): void {
-    console.log(state.leftHand.exists + " : " + state.rightHand.exists);
-
     if (state.leftHand.exists) {
+      console.log(state.leftHand.gesture);
       // IMPORTANT: no break on non scale related, breaks scaling logic
       switch (state.leftHand.gesture) {
         case HandGesture.THUMB_UP:

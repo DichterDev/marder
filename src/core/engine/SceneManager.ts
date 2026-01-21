@@ -22,10 +22,6 @@ export class SceneManager {
   private readonly frameInterval: number = 1 / 60;
   private deltaAccumulator: number = 0;
 
-  private prevGestureState: GestureState | null = null;
-  private gCounterLeft: number = 0;
-  private gCounterRight: number = 0;
-
   private currentModel: Object;
 
   private canvas: HTMLCanvasElement;
@@ -91,22 +87,6 @@ export class SceneManager {
   }
 
   private applyGestureState(state: GestureState): void {
-    if (this.prevGestureState) {
-      if (this.prevGestureState.leftHand.gesture === state.leftHand.gesture) {
-        this.gCounterLeft += 1;
-      } else {
-        this.gCounterLeft = 0;
-      }
-
-      if (this.prevGestureState.rightHand.gesture === state.rightHand.gesture) {
-        this.gCounterRight += 1;
-      } else {
-        this.gCounterRight = 0;
-      }
-    }
-
-    this.prevGestureState = state;
-
     if (state.leftHand.exists && !state.rightHand.exists) {
       let nextModel: Object | null = null;
 
@@ -126,14 +106,6 @@ export class SceneManager {
       if (nextModel) {
         this.morphHandler.startMorph(this.currentModel, nextModel);
       }
-    }
-
-    if (this.gCounterLeft < 10) {
-      state.leftHand.gesture = HandGesture.NONE;
-    }
-
-    if (this.gCounterRight < 10) {
-      state.rightHand.gesture = HandGesture.NONE;
     }
 
     this.currentModel.handleGesture(state);
