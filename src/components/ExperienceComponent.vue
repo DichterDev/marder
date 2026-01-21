@@ -123,7 +123,7 @@ const initializeEverything = async (): Promise<void> => {
 
 .prompt-line {
   font-family: "monomaniac", monospace; /* Strictly following your font rule */
-  font-size: 3.5rem;
+  font-size: 2rem;
   text-transform: lowercase;
   color: var(--text-white);
   background: none;
