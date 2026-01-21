@@ -6,12 +6,10 @@ export class AudioHandler {
   private currentSource: AudioBufferSourceNode | null = null;
   private gainNode: GainNode | null = null;
   
-  // Um zu verhindern, dass bei jedem Frame der gleiche Song neu startet
   private currentFilePath: string | null = null;
 
   public async init(): Promise<void> {
     try {
-      // Setup ohne Mikrofon-Zugriff!
       this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
       
       this.analyser = this.audioContext.createAnalyser();
@@ -21,7 +19,6 @@ export class AudioHandler {
       this.gainNode = this.audioContext.createGain();
       this.gainNode.connect(this.audioContext.destination);
       
-      // Standard-Lautstärke (etwas reduziert)
       this.gainNode.gain.value = 0.4;
       
     } catch (err) {
@@ -40,20 +37,16 @@ export class AudioHandler {
     }
 
     try {
-      // 1. Audio laden
       const response = await fetch(filePath);
       const arrayBuffer = await response.arrayBuffer();
       const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
 
-      // 2. Alten Song stoppen (Crossfade wäre hier möglich, aber wir machen Hard-Cut für Snappiness)
       this.stopCurrent();
 
-      // 3. Neuen Song starten
       const srcNode = this.audioContext.createBufferSource();
       srcNode.buffer = audioBuffer;
-      srcNode.loop = true; // Songs loopen, solange die Stimmung hält
+      srcNode.loop = true;
 
-      // Routing: Source -> Analyser -> Gain -> Speakers
       srcNode.connect(this.analyser);
       this.analyser.connect(this.gainNode);
 
@@ -87,7 +80,6 @@ export class AudioHandler {
     
     this.analyser.getByteFrequencyData(this.dataArray);
 
-    // Bassbereich (erste paar Bins) durchschnittlich berechnen
     let bassSum = 0;
     const binsToTrack = 6;
     for (let i = 0; i < binsToTrack; i++) {
@@ -96,4 +88,4 @@ export class AudioHandler {
 
     return (bassSum / binsToTrack) / 255; 
   }
-}
+} 

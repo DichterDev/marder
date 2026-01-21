@@ -78,10 +78,6 @@ const initializeEverything = async (): Promise<void> => {
   justify-content: center;
 }
 
-/* Point Grid Implementation:
-  Uses a radial gradient background pattern to ensure infinite vertical 
-  and horizontal coverage without DOM overhead.
-*/
 .grid-container {
   position: absolute;
   inset: 0;
@@ -93,7 +89,6 @@ const initializeEverything = async (): Promise<void> => {
   background-size: 32px 32px;
   background-position: center;
 
-  /* Mask to create the "hole" behind the text and fade edges */
   mask-image: radial-gradient(
     circle at center,
     transparent 0px,
@@ -122,7 +117,7 @@ const initializeEverything = async (): Promise<void> => {
 }
 
 .prompt-line {
-  font-family: "monomaniac", monospace; /* Strictly following your font rule */
+  font-family: "monomaniac", monospace;
   font-size: 2rem;
   text-transform: lowercase;
   color: var(--text-white);

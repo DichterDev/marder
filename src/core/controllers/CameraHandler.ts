@@ -23,10 +23,9 @@ export class CameraHandler {
         numHands: 2,
       });
       
-      // Webcam-Zugriff anfragen
       this.video.srcObject = await navigator.mediaDevices.getUserMedia({
         video: { width: { ideal: 1920 }, height: { ideal: 1080 } },
-        audio: false // WICHTIG: Audio hier deaktiviert lassen!
+        audio: false
       });
       
     } catch (err) {
@@ -36,7 +35,7 @@ export class CameraHandler {
 
   getResults() {
     if (this.video.readyState < 2) return null;
-    if (!this.recognizer) return null; // Schutz, falls init noch nicht fertig ist
+    if (!this.recognizer) return null;
 
     const timestamp = Math.round(performance.now());
     try {
@@ -46,4 +45,4 @@ export class CameraHandler {
       return null;
     }
   }
-}
+} 

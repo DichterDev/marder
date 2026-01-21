@@ -1,4 +1,3 @@
-// src/core/engine/MorphHandler.ts
 import * as THREE from "three";
 import type { Object } from "../objects/Object";
 
@@ -8,11 +7,8 @@ export class MorphHandler {
   private currentModel: Object | null = null;
   private targetModel: Object | null = null;
 
-  private readonly MORPH_SPEED = 1.2; // Adjust for faster/slower transitions
+  private readonly MORPH_SPEED = 1.2;
 
-  /**
-   * Starts the transition from the current model to a new one.
-   */
   public startMorph(current: Object, target: Object): void {
     if (this.isMorphing) return;
 
@@ -28,9 +24,6 @@ export class MorphHandler {
     );
   }
 
-  /**
-   * Updates the morph progress. Returns true when the morph is complete.
-   */
   public update(delta: number): boolean {
     if (!this.isMorphing || !this.currentModel) return false;
 
@@ -43,7 +36,7 @@ export class MorphHandler {
 
     if (this.progress >= 1.0) {
       this.isMorphing = false;
-      return true; // Signal completion to SceneManager
+      return true;
     }
 
     return false;

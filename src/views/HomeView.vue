@@ -52,7 +52,7 @@ import HeaderComponent from "@/components/HeaderComponent.vue";
 .viewport-container {
   position: relative;
   width: 60vw;
-  aspect-ratio: 16 / 9; /* Maintains aspect ratio */
+  aspect-ratio: 16 / 9;
   background: #050505;
   border: 1px solid var(--brand-red);
   box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);

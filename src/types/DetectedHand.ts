@@ -1,4 +1,3 @@
-// src/types/DetectedHand.ts
 import type { NormalizedLandmark } from "@mediapipe/tasks-vision";
 import { HandGesture } from "./Gestures";
 

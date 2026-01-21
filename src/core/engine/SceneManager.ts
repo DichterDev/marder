@@ -93,36 +93,32 @@ export class SceneManager {
   }
 
   private applyGestureState(state: GestureState): void {
-    // --- MODELL WECHSEL LOGIK (Linke Hand) ---
     if (state.leftHand.exists && !this.morphHandler.isActive()) {
       let nextModel: Object | null = null;
 
       switch (state.leftHand.gesture) {
         case HandGesture.OPEN_PALM: 
-          // HIER: Linke offene Hand -> ALLES STOPPEN & RESET
           this.stopEverything();
           if (!(this.currentModel instanceof Sphere)) {
-             nextModel = new Sphere();
+            nextModel = new Sphere();
           }
           break;
           
         case HandGesture.CLOSED_FIST:
-          // Faust setzt nur das Modell zurück, stoppt aber Audio nicht zwingend
-          // (kannst du ändern, wenn Faust auch Ton stoppen soll)
           if (!(this.currentModel instanceof Sphere)) {
-             nextModel = new Sphere();
+            nextModel = new Sphere();
           }
           break;
 
         case HandGesture.POINTING_UP:
           this.triggerAudioCategory("BASKETBALL");
           if (!(this.currentModel instanceof Basketball)) {
-             nextModel = new Basketball();
+            nextModel = new Basketball();
           }
           break;
         case HandGesture.I_LOVE_YOU:
           if (!(this.currentModel instanceof Heart)) {
-             nextModel = new Heart();
+            nextModel = new Heart();
           }
           break;
       }
@@ -132,7 +128,6 @@ export class SceneManager {
       }
     }
 
-    // --- AUDIO & STIMMUNG (Rechte Hand) ---
     if (state.rightHand.exists) {
       switch (state.rightHand.gesture) {
         case HandGesture.THUMB_UP: this.triggerAudioCategory("HAPPY"); break;
@@ -141,7 +136,6 @@ export class SceneManager {
         case HandGesture.I_LOVE_YOU: this.triggerAudioCategory("LOVE"); break;
         case HandGesture.CLOSED_FIST: this.triggerAudioCategory("ANGRY"); break;
         case HandGesture.OPEN_PALM: 
-          // Rechte Hand macht jetzt nichts mehr (oder du belegst es anders)
           break;
       }
     }
@@ -150,19 +144,16 @@ export class SceneManager {
       switch (state.leftHand.gesture) {
         case HandGesture.OPEN_PALM: this.stopEverything();
         default: break;
-      
       }
     }
 
-    // Beide Fäuste -> Angry
     if (state.leftHand.exists && state.rightHand.exists) {
       if (state.rightHand.gesture === HandGesture.CLOSED_FIST &&
-          state.leftHand.gesture === HandGesture.CLOSED_FIST) {
+        state.leftHand.gesture === HandGesture.CLOSED_FIST) {
         this.triggerAudioCategory("ANGRY");
       }
     }
 
-    // --- TRACKING ---
     this.currentModel.handleGesture(state);
 
     if (state.targetPosition) {
@@ -177,7 +168,6 @@ export class SceneManager {
     }
   }
 
-  // Stoppt Audio und setzt Kategorie zurück
   private stopEverything(): void {
     if (this.currentAudioCategory === null) return; 
 
@@ -222,4 +212,4 @@ export class SceneManager {
     this.renderer.dispose();
     this.currentModel.dispose();
   }
-}
+} 

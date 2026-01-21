@@ -96,11 +96,9 @@ export class Sphere implements Object {
       // IMPORTANT: no break on non scale related, breaks scaling logic
       switch (state.leftHand.gesture) {
         case HandGesture.THUMB_UP:
-          // increase scale
           this.growthDirection = 1;
           break;
         case HandGesture.THUMB_DOWN:
-          // decrase scale
           this.growthDirection = -1;
           break;
         default:

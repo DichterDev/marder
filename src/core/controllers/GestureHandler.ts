@@ -5,29 +5,21 @@ import { HandGesture } from "@/types/Gestures";
 import { HandLandmark } from "@/types/HandLandmarks";
 
 export class GestureHandler {
-  /**
-   * Translates MediaPipe results into a clean, actionable state.
-   */
   public processResults(results: GestureRecognizerResult): GestureState {
     const hands = this.parseHands(results);
 
     let targetPosition = null;
 
-    // 1. BASKETBALL TRACKING (Neu)
-    // Wenn die linke Hand "Pointing Up" macht -> Tracking auf Zeigefinger-Spitze
     if (hands.leftHand.exists && hands.leftHand.gesture === HandGesture.POINTING_UP) {
       const tip = hands.leftHand.landmarks[HandLandmark.INDEX_FINGER_TIP];
       if (tip) {
         targetPosition = {
-          // Koordinaten skalieren und zentrieren (Werte müssen ggf. an deinen Screen angepasst werden)
           x: -(tip.x - 0.5) * 20,
           y: -(tip.y - 0.5) * 11.25,
           z: -tip.z * 15,
         };
       }
     }
-    // 2. Altes Co-op Movement (Optional, falls du es behalten willst)
-    // Überschreibt Basketball, falls beide Hände aktiv sind
     else if (
       hands.leftHand.exists &&
       hands.rightHand.exists &&
@@ -66,7 +58,7 @@ export class GestureHandler {
       const score = category.score;
       const gesture = category.categoryName as HandGesture;
 
-      if (score < 0.5) return; // Nur sichere Gesten akzeptieren
+      if (score < 0.5) return;
 
       if (handedness === "Left") {
         leftHand = new DetectedHand(landmarks, gesture);
@@ -77,4 +69,4 @@ export class GestureHandler {
 
     return { leftHand, rightHand };
   }
-}
+} 
